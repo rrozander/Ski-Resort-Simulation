@@ -16,8 +16,10 @@ The casy study for this particular simulation will be Mount Washington Ski Resor
 ### Queueing Network
 Here is the run and lift network for Mount Washington Ski Resort that is used as reference for creating the queueing network used in the simulation.
 
-[MountWashingtonTrailMap_compressed.pdf](https://github.com/user-attachments/files/23554554/MountWashingtonTrailMap_compressed.pdf)
+<img width="2170" height="1826" alt="MountWashingtonTrailMap_compressed-1" src="https://github.com/user-attachments/assets/3ebd5e7c-9252-485e-a747-06937f29cbb0" />
+
 
 The resulting queueing network with the assumed probabilities for moving through the resort is shown below.
 
-[CSC446QueueNetwork.pdf](https://github.com/user-attachments/files/23554595/CSC446QueueNetwork.pdf)
+<img width="1667" height="2356" alt="CSC446QueueNetwork-1" src="https://github.com/user-attachments/assets/2001a864-b9e2-43b0-b6c9-891b5301b553" />
+
