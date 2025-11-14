@@ -14,5 +14,10 @@ The casy study for this particular simulation will be Mount Washington Ski Resor
 - **Skiers (Customers)**: Arrive at the base area following a poisson distribution.
     
 ### Queueing Network
-Here is the run and lift network for Mount Washington Ski Resort that is used as reference for creating the queuign network used in the simulation.
+Here is the run and lift network for Mount Washington Ski Resort that is used as reference for creating the queueing network used in the simulation.
 
+[MountWashingtonTrailMap_compressed.pdf](https://github.com/user-attachments/files/23554554/MountWashingtonTrailMap_compressed.pdf)
+
+The resulting queueing network with the assumed probabilities for moving through the resort is shown below.
+
+[CSC446QueueNetwork.pdf](https://github.com/user-attachments/files/23554595/CSC446QueueNetwork.pdf)
