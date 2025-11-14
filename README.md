@@ -20,6 +20,5 @@ Here is the run and lift network for Mount Washington Ski Resort that is used as
 
 
 The resulting queueing network with the assumed probabilities for moving through the resort is shown below.
-
 <img width="1667" height="2356" alt="CSC446QueueNetwork-1" src="https://github.com/user-attachments/assets/2001a864-b9e2-43b0-b6c9-891b5301b553" />
 
