@@ -2,6 +2,8 @@
 Ski lift simulation project for UVic CSC 446 (Simulations in Operations Research)
 
 The casy study for this particular simulation will be Mount Washington Ski Resort located on Vancouver Island.
+
+https://docs.google.com/document/d/1bMfGU1V7F6jM_GblCSP-SJLqKK_qaCT2g83biJwS7cA/edit?usp=sharing
 ## Purpose
 - Design and implement a discrete-event simulation of the resort lift and runs.
 - Evaluate key metrics that include the average wait time, lift utilization, and total skier throughput.
