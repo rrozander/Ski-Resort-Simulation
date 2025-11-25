@@ -1,8 +1,8 @@
 class lift:
-    def __init__(self, incoming_runs, outgoing_runs):
-        lift_capacity = 0
-        lift_speed = 0 # How long it takes to ride the lift
-        lift_wait_time = 0 # Wait for a lift to arrive + pick people up
+    def __init__(self, incoming_runs, outgoing_runs, capacity, speed):
+        lift_capacity = capacity
+        lift_speed = speed # How long it takes to ride the lift - in minutes
+        lift_wait_time = 0 # Wait for a lift to arrive + pick people up - in minutes
 
         pass
     
