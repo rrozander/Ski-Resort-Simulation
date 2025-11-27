@@ -1,15 +1,33 @@
 from lift import lift
 from run import run
+import heapq
+import numpy as np
+
+np.random.seed(3)
 class Skier:
   # this is a class to keep track of a skiers stats
   def __init__(self):
     self.time_in_line = 0
     self.time_on_lift = 0
 
-  
+class Event:
+  def __init__(self, time, etype, obj, skier=None):
+    self.time = time
+    self.etype = etype      # "RESORT_ARRIVAL", "LIFT_DEPART", "RUN_FINISH"
+    self.obj = obj          # Lift or Run or None
+    self.skier = skier      # Skier
+
+def generateInterArrival(mean):
+    """Function to generate exponential random variates."""
+    return -mean * np.log(np.random.uniform(0, 1))
 
 def main():
-# Initialize the system
+  # Initialize the system
+  CLOSE_TIME = 8 * 60.0
+  LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
+  event_queue = []   # heap of Event
+  sim_time = 0.0
+
   # create all runs
   run_E_W = run(avg_time=0.5, chance_to_take=0.1)
   run_E_H = run(avg_time=3.5, chance_to_take=0.15)
@@ -83,10 +101,38 @@ def main():
     15
   )
 
+  # Scheduler function
+  def schedule(event):
+    if event.time <= CLOSE_TIME:
+      heapq.heappush(event_queue, event)
+
+  # initialize with first resort arrival
+  arrival_dt = generateInterArrival(LAMBDA)
+  schedule(Event((sim_time + arrival_dt), "RESORT_ARRIVAL", None, None))
+
   # Loop until we hit a specified time on the simulation clock (Resort Closing Time)
-  while True:
-    # Find next event type
-    pass
+  while event_queue:
+    ev = heapq.heappop(event_queue)
+    current_time = ev.time
+    if current_time > CLOSE_TIME:
+      break
+
+    if ev.etype == "RESORT_ARRIVAL":
+      # create skier and send to random entry lift
+      skier = Skier()
+        
+      # schedule next resort arrival
+      inter = generateInterArrival(LAMBDA)
+      schedule(Event(current_time + inter, "RESORT_ARRIVAL", None, None))
+
+    elif ev.etype == "LIFT_DEPART":
+      # call depart method of lift
+      pass
+
+    elif ev.etype == "RUN_FINISH":
+      # call depart function of run
+      pass
+    
     # Time average statistics
 
     # Invoke next event function

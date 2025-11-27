@@ -1,3 +1,5 @@
+from main import Event  # or put Event in a shared module
+
 class lift:
     def __init__(self, incoming_runs, outgoing_runs, capacity, speed):
         self.lift_capacity = capacity
@@ -6,9 +8,8 @@ class lift:
         self.incoming_runs = incoming_runs # these should be objects containing percentages
         self.outgoing_runs = outgoing_runs
 
-        self.upcoming_events = [0, float('inf'), float('inf')] # next events array [0] not use, [1] for arrival, [2] for departure - may need to be changed
-        self.lift_queue = [] # array of skier objects
-        self.on_lift = [] # array of arrays of skier objects representning chairs on lift
+        self.queue = []
+        self.in_service = None
 
     
     def get_outgoing_runs(self):
@@ -17,20 +18,27 @@ class lift:
     def get_incoming_runs(self):
         pass
 
-    def arrival_event(self):
-        # Schedule next arrival event
+    # need a function to choose next run
 
-        # Check the queue size to determain what to do
-          # Less than capacity -> queue until we hit capacity
-          # At capacity -> depart immediately
-          # Over capacity -> Add to queue
+    def handle_arrival(self, t, skier, schedule):
+        self.queue.append(skier)
+        if self.in_service is None:
+            self._start_service(t, schedule)
 
-        # Schedule departure 
-        # maybe this should emit the time on lift so that it can be used to schedule arrival to next run
-        # since incoming runs is an array of objects with the run class we could also just call the arrive event with the sim time
-        pass
-    
-    def departure_event(self):
-        
-        pass
+    def _start_service(self, t, schedule):
+        if not self.queue:
+            return
+        self.in_service = self.queue.pop(0)
+        depart_time = t + self.lift_speed
+        schedule(Event(depart_time, "LIFT_DEPART", self, None))
+
+    def handle_departure(self, t, schedule):
+        skier = self.in_service
+        self.in_service = None
+
+        # run = self._choose_run()
+        # run.handle_run_start(t, skier, schedule)
+
+        if self.queue:
+            self._start_service(t, schedule)
     
