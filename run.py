@@ -1,11 +1,12 @@
 from main import generateInterArrival
 from main import Event
+from __future__ import annotations
 
 class run:
-    def __init__(self, avg_time, chance_to_take):
+    def __init__(self, avg_time: float, chance_to_take: float):
         self.avg_run_time = avg_time # average time to complete the run - in minutes
         self.percentage_traffic = chance_to_take
-        self.next_lift = None  # set from main
+        self.next_lift = None  # type: lift | None
 
     def handle_run_start(self, t, skier, schedule):
         if self.avg_run_time <= 0:

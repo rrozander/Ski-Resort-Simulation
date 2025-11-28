@@ -1,5 +1,4 @@
-from lift import lift
-from run import run
+from lift_run import lift, run
 import heapq
 import numpy as np
 
@@ -100,6 +99,46 @@ def main():
     4,
     15
   )
+
+  # assign dest lift for each run - all out runs should have dest lift = None
+  # Runs that go *to* E
+  run_W_E.dest_lift  = lift_E
+  run_S_E.dest_lift  = lift_E
+  run_H_E.dest_lift  = lift_E
+  run_BB_E.dest_lift = lift_E
+  run_E_E.dest_lift  = lift_E   # E → E loop
+  run_E_Out.dest_lift = None    # leaves resort
+
+  # Runs that go *to* W
+  run_E_W.dest_lift  = lift_W
+  run_S_W.dest_lift  = lift_W
+  run_H_W.dest_lift  = lift_W
+  run_W_W.dest_lift  = lift_W   # W → W loop
+  run_W_Out.dest_lift = None    # leaves resort
+
+  # Runs that go *to* S
+  run_E_S.dest_lift  = lift_S
+  run_W_S.dest_lift  = lift_S
+  run_S_S.dest_lift  = lift_S   # S → S loop
+  run_S_Out.dest_lift = None
+
+  # Runs that go *to* H
+  run_E_H.dest_lift  = lift_H
+  run_W_H.dest_lift  = lift_H
+  run_S_H.dest_lift  = lift_H
+  run_BF_H.dest_lift = lift_H
+  run_BB_H.dest_lift = lift_H
+  run_H_H.dest_lift  = lift_H   # H → H loop
+  run_H_Out.dest_lift = None
+
+  # Runs that go *to* BF
+  run_BF_BF.dest_lift = lift_BF   # BF → BF loop
+  run_BB_BF.dest_lift = lift_BF
+
+  # Runs that go *to* BB
+  run_E_BB.dest_lift  = lift_BB
+  run_BF_BB.dest_lift = lift_BB
+  run_BB_BB.dest_lift = lift_BB   # BB → BB loop
 
   # Scheduler function
   def schedule(event):

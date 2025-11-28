@@ -1,4 +1,7 @@
 from main import Event  # or put Event in a shared module
+from __future__ import annotations
+from typing import List
+
 
 class lift:
     def __init__(self, incoming_runs, outgoing_runs, capacity, speed):
@@ -19,6 +22,9 @@ class lift:
         pass
 
     # need a function to choose next run
+    def chose_run():
+        # first get array of weights
+        weights = []
 
     def handle_arrival(self, t, skier, schedule):
         self.queue.append(skier)
