@@ -13,6 +13,10 @@ class Event:
     self.obj = obj          # Lift or Run or None
     self.skier = skier      # Skier
 
+  def __lt__(self, other):
+    """Compare events by time for heap ordering."""
+    return self.time < other.time
+
   def generateInterArrival(mean: float) -> float:
     """Function to generate exponential random variates."""
     return -mean * np.log(np.random.uniform(0, 1))

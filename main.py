@@ -8,7 +8,7 @@ import numpy as np
 
 np.random.seed(3)
 
-CLOSE_TIME = 8 * 60.0
+CLOSE_TIME = 1 * 60.0
 LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
@@ -16,13 +16,14 @@ def main():
   event_queue: list[Event] = []
   sim_time = 0.0
 
-  initialize_runs_and_lifts()
+  entry_lifts: list[Lift] = initialize_runs_and_lifts()
 
-  # initialize with first resort arrival
+  # Initialize with first resort arrival
   arrival_dt = Event.generateInterArrival(LAMBDA)
   schedule(event_queue, Event((sim_time + arrival_dt), Event.EventType.RESORT_ARRIVAL, None, None))
 
   print("Starting simulation")
+
   # Loop until we hit a specified time on the simulation clock (Resort Closing Time)
   while event_queue:
     ev: Event = heapq.heappop(event_queue)
@@ -32,17 +33,23 @@ def main():
 
     if ev.etype == Event.EventType.RESORT_ARRIVAL:
       # create skier and send to random entry lift
-      # print(f"Resort arrival at time {current_time:.2f} minutes")
       new_skier = Skier()
+      print(f"Skier {new_skier.id} arrives at resort {current_time:.2f} minutes")
       
       # schedule next resort arrival
       inter = Event.generateInterArrival(LAMBDA)
       schedule(event_queue, Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
 
+      # Send to entry lift
+      # TODO we should pick this based on weights. Random for now
+      entry_lift: Lift = np.random.choice(entry_lifts)
+      entry_lift.handle_arrival(current_time, new_skier, lambda e: schedule(event_queue, e))
+
     elif ev.etype == Event.EventType.LIFT_DEPART:
       # call depart method of lift
-      # print(f"Lift departure at time {current_time:.2f} minutes")
-      pass
+      lift: Lift = ev.obj 
+
+      lift.handle_departure(current_time, lambda e: schedule(event_queue, e))
 
     elif ev.etype == Event.EventType.RUN_FINISH:
       # call depart function of run
@@ -54,6 +61,7 @@ def main():
     # Invoke next event function
   # Output results
   pass
+
 
 
 def schedule(event_queue: list[Event], new_event: Event) -> None:
@@ -98,36 +106,42 @@ def initialize_runs_and_lifts():
 
   # create all lifts
   lift_E = Lift(
+    "Lift E",
     [run_E_E, run_W_E, run_S_E, run_H_E, run_BB_E],
     [run_E_W, run_E_H, run_E_BB, run_E_S, run_E_E, run_E_Out],
     4,
     10
   )
   lift_W = Lift(
+    "Lift W",
     [run_E_W, run_W_W, run_H_W, run_S_W],
     [run_W_E, run_W_S, run_W_H, run_W_W, run_W_Out],
     3, 
     10
   )
   lift_S = Lift(
+    "Lift S",
     [run_E_S, run_W_S, run_S_S],
     [run_S_S, run_S_W, run_S_E, run_S_H, run_S_Out],
     4,
     15
   )
   lift_H = Lift(
+    "Lift H",
     [run_E_H, run_W_H, run_S_H, run_BF_H, run_BB_H, run_H_H],
     [run_H_H, run_H_E, run_H_W, run_H_BF, run_H_Out],
     6,
     10
   )
   lift_BF = Lift(
+    "Lift BF",
     [run_BF_BF, run_BB_BF, run_H_BF],
     [run_BF_BF, run_BF_H, run_BF_BB],
     4,
     5
   )
   lift_BB = Lift(
+    "Lift BB",
     [run_BB_BB, run_BF_BB, run_E_BB],
     [run_BB_BB, run_BB_BF, run_BB_E, run_BB_H],
     4,
@@ -173,6 +187,9 @@ def initialize_runs_and_lifts():
   run_E_BB.dest_lift  = lift_BB
   run_BF_BB.dest_lift = lift_BB
   run_BB_BB.dest_lift = lift_BB   # BB → BB loop
+
+
+  return [lift_H, lift_E, lift_W, lift_S]  # entry lifts
 
 
 if __name__ == "__main__":

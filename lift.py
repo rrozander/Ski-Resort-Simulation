@@ -1,14 +1,16 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING
 from event import Event
 import numpy as np
 
 if TYPE_CHECKING:
     from run import Run
+    from skier import Skier
 
 
 class Lift:
-    def __init__(self, incoming_runs: list[Run], outgoing_runs: list[Run], capacity: int, speed: float):
+    def __init__(self, name: str, incoming_runs: list[Run], outgoing_runs: list[Run], capacity: int, speed: float):
+        self.name = name
         self.lift_capacity = capacity
         self.lift_speed = speed # How long it takes to ride the lift - in minutes
         self.lift_wait_time: float = 0 # Wait for a lift to arrive + pick people up - in minutes
@@ -16,14 +18,7 @@ class Lift:
         self.outgoing_runs: list[Run] = outgoing_runs
 
         self.queue = []
-        self.in_service = None
-
-    
-    def get_outgoing_runs(self):
-        pass
-    
-    def get_incoming_runs(self):
-        pass
+        self.skiers_in_service = None
 
     # need a function to choose next run
     def choose_run(self) -> Run | None:
@@ -43,26 +38,40 @@ class Lift:
         run_choice = np.random.choice(self.outgoing_runs, p=weights)
         return run_choice
 
-    def handle_arrival(self, t, skier, schedule):
+    def handle_arrival(self, current_time: float, skier: Skier, schedule: Callable[[Event], None]) -> None:
         self.queue.append(skier)
-        if self.in_service is None:
-            self._start_service(t, schedule)
 
-    def _start_service(self, t, schedule):
+        if self.skiers_in_service is None:
+            # No one is in queue
+            self.start_service(current_time, schedule)
+        # else:
+        #     # Skier need to wait in line
+        #     # TODO: implement wait logic
+
+        #     print(f"{self.name} Full")
+        #     pass
+
+    def start_service(self, current_time: float, schedule: Callable[[Event], None]) -> None:
+        # Serves the next skier in line
+        # TODO: Update this with the capacity logic
         if not self.queue:
             return
-        self.in_service = self.queue.pop(0)
-        depart_time = t + self.lift_speed
+        self.skiers_in_service = self.queue.pop(0)
+        print(f"{self.name} Serving Skier {self.skiers_in_service.id} at {current_time:.2f} minutes")
+        depart_time = current_time + self.lift_speed
         schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
 
-    def handle_departure(self, t, schedule,):
-        skier = self.in_service
-        self.in_service = None
+    def handle_departure(self, current_time: float, schedule: Callable[[Event], None]) -> None:
+        skier = self.skiers_in_service
+        self.skiers_in_service = None
 
+        print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")
+        
         run = self.choose_run()
         # need some error handling here
-        run.handle_run_start(t, skier, schedule)
+        # TODO Implement run start
+        # run.handle_run_start(current_time, skier, schedule)
 
-        if self.queue:
-            self._start_service(t, schedule)
+        if self.queue != []:
+            self.start_service(current_time, schedule)
     
