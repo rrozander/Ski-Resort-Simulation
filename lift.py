@@ -1,9 +1,11 @@
-from __future__ import annotations
+from run import Run
+from typing import List
 from event import Event
+import numpy as np
 
 
-class lift:
-    def __init__(self, incoming_runs, outgoing_runs, capacity, speed):
+class Lift:
+    def __init__(self, incoming_runs: List[Run], outgoing_runs: List[Run], capacity: int, speed: float):
         self.lift_capacity = capacity
         self.lift_speed = speed # How long it takes to ride the lift - in minutes
         self.lift_wait_time = 0 # Wait for a lift to arrive + pick people up - in minutes
@@ -21,9 +23,22 @@ class lift:
         pass
 
     # need a function to choose next run
-    def chose_run():
+    def choose_run(self):
         # first get array of weights
         weights = []
+        weight_sum = 0
+        for ski_run in self.outgoing_runs:   # outgoing_runs is your list of Run objects
+            weight = ski_run.chance_to_take
+            weights.append(weight)
+            weight_sum += weight
+
+        # error check
+        if (len(weights) != len(self.outgoing_runs)) or weight_sum != 1:
+            return None
+
+        # make choice
+        run_choice = np.random.choice(self.outgoing_runs, p=weights) # type: run
+        return run_choice
 
     def handle_arrival(self, t, skier, schedule):
         self.queue.append(skier)
@@ -35,14 +50,15 @@ class lift:
             return
         self.in_service = self.queue.pop(0)
         depart_time = t + self.lift_speed
-        schedule(Event(depart_time, "LIFT_DEPART", self, None))
+        schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
 
-    def handle_departure(self, t, schedule):
+    def handle_departure(self, t, schedule,):
         skier = self.in_service
         self.in_service = None
 
-        # run = self._choose_run()
-        # run.handle_run_start(t, skier, schedule)
+        run = self.choose_run()
+        # need some error handling here
+        run.handle_run_start(t, skier, schedule)
 
         if self.queue:
             self._start_service(t, schedule)

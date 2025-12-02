@@ -1,11 +1,11 @@
 from __future__ import annotations
 from event import Event
 
-class run:
+class Run:
     def __init__(self, avg_time: float, chance_to_take: float):
         self.avg_run_time = avg_time # average time to complete the run - in minutes
         self.percentage_traffic = chance_to_take
-        self.next_lift = None  # type: lift | None
+        self.next_lift = None  # type: Lift | None
 
     def handle_run_start(self, t, skier, schedule):
         if self.avg_run_time <= 0:
@@ -13,7 +13,7 @@ class run:
             return
         run_time = Event.generateInterArrival(self.avg_run_time)
         finish_time = t + run_time
-        schedule(Event(finish_time, "RUN_FINISH", self, skier))
+        schedule(Event(finish_time, Event.EventType.RUN_FINISH, self, skier))
 
     def handle_run_finish(self, t, skier, schedule):
         if self.next_lift is not None:

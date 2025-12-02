@@ -1,9 +1,15 @@
+from enum import Enum
 import numpy as np
 
 class Event:
-  def __init__(self, time, etype, obj, skier=None):
+  class EventType(Enum):
+    RESORT_ARRIVAL = 1
+    LIFT_DEPART = 2
+    RUN_FINISH = 3
+
+  def __init__(self, time, etype: EventType, obj, skier=None):
     self.time = time
-    self.etype = etype      # "RESORT_ARRIVAL", "LIFT_DEPART", "RUN_FINISH"
+    self.etype = etype
     self.obj = obj          # Lift or Run or None
     self.skier = skier      # Skier
 
