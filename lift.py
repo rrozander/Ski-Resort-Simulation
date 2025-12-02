@@ -1,16 +1,19 @@
-from run import Run
-from typing import List
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from event import Event
 import numpy as np
 
+if TYPE_CHECKING:
+    from run import Run
+
 
 class Lift:
-    def __init__(self, incoming_runs: List[Run], outgoing_runs: List[Run], capacity: int, speed: float):
+    def __init__(self, incoming_runs: list[Run], outgoing_runs: list[Run], capacity: int, speed: float):
         self.lift_capacity = capacity
         self.lift_speed = speed # How long it takes to ride the lift - in minutes
-        self.lift_wait_time = 0 # Wait for a lift to arrive + pick people up - in minutes
-        self.incoming_runs = incoming_runs # these should be objects containing percentages
-        self.outgoing_runs = outgoing_runs
+        self.lift_wait_time: float = 0 # Wait for a lift to arrive + pick people up - in minutes
+        self.incoming_runs: list[Run] = incoming_runs
+        self.outgoing_runs: list[Run] = outgoing_runs
 
         self.queue = []
         self.in_service = None
@@ -23,12 +26,12 @@ class Lift:
         pass
 
     # need a function to choose next run
-    def choose_run(self):
+    def choose_run(self) -> Run | None:
         # first get array of weights
         weights = []
         weight_sum = 0
         for ski_run in self.outgoing_runs:   # outgoing_runs is your list of Run objects
-            weight = ski_run.chance_to_take
+            weight = ski_run.percentage_traffic
             weights.append(weight)
             weight_sum += weight
 
@@ -37,7 +40,7 @@ class Lift:
             return None
 
         # make choice
-        run_choice = np.random.choice(self.outgoing_runs, p=weights) # type: run
+        run_choice = np.random.choice(self.outgoing_runs, p=weights)
         return run_choice
 
     def handle_arrival(self, t, skier, schedule):

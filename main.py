@@ -1,3 +1,4 @@
+from __future__ import annotations
 from lift import Lift
 from run import Run
 from skier import Skier
@@ -12,7 +13,7 @@ LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
   # Initialize the system
-  event_queue = []   # heap of Event
+  event_queue: list[Event] = []
   sim_time = 0.0
 
   initialize_runs_and_lifts()
@@ -24,25 +25,28 @@ def main():
   print("Starting simulation")
   # Loop until we hit a specified time on the simulation clock (Resort Closing Time)
   while event_queue:
-    ev = heapq.heappop(event_queue)
+    ev: Event = heapq.heappop(event_queue)
     current_time = ev.time
     if current_time > CLOSE_TIME:
       break
 
     if ev.etype == Event.EventType.RESORT_ARRIVAL:
       # create skier and send to random entry lift
-      skier = Skier()
-        
+      # print(f"Resort arrival at time {current_time:.2f} minutes")
+      new_skier = Skier()
+      
       # schedule next resort arrival
       inter = Event.generateInterArrival(LAMBDA)
-      schedule(event_queue,Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
+      schedule(event_queue, Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
 
     elif ev.etype == Event.EventType.LIFT_DEPART:
       # call depart method of lift
+      # print(f"Lift departure at time {current_time:.2f} minutes")
       pass
 
     elif ev.etype == Event.EventType.RUN_FINISH:
       # call depart function of run
+      # print(f"Run finish at time {current_time:.2f} minutes")
       pass
     
     # Time average statistics
@@ -52,7 +56,7 @@ def main():
   pass
 
 
-def schedule(event_queue, new_event):
+def schedule(event_queue: list[Event], new_event: Event) -> None:
   if new_event.time <= CLOSE_TIME:
     heapq.heappush(event_queue, new_event)
 

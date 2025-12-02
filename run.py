@@ -1,13 +1,17 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from event import Event
+
+if TYPE_CHECKING:
+    from lift import Lift
 
 class Run:
     def __init__(self, avg_time: float, chance_to_take: float):
         self.avg_run_time = avg_time # average time to complete the run - in minutes
         self.percentage_traffic = chance_to_take
-        self.next_lift = None  # type: Lift | None
+        self.next_lift: Lift | None = None
 
-    def handle_run_start(self, t, skier, schedule):
+    def handle_run_start(self, t, skier, schedule: callable):
         if self.avg_run_time <= 0:
             self.handle_run_finish(t, skier, schedule)
             return
