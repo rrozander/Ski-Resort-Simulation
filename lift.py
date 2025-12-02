@@ -1,6 +1,5 @@
-from main import Event  # or put Event in a shared module
 from __future__ import annotations
-from typing import List
+from event import Event
 
 
 class lift:

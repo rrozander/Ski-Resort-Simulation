@@ -1,6 +1,5 @@
-from main import generateInterArrival
-from main import Event
 from __future__ import annotations
+from event import Event
 
 class run:
     def __init__(self, avg_time: float, chance_to_take: float):
@@ -12,7 +11,7 @@ class run:
         if self.avg_run_time <= 0:
             self.handle_run_finish(t, skier, schedule)
             return
-        run_time = generateInterArrival(self.avg_run_time)
+        run_time = Event.generateInterArrival(self.avg_run_time)
         finish_time = t + run_time
         schedule(Event(finish_time, "RUN_FINISH", self, skier))
 

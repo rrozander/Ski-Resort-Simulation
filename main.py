@@ -1,4 +1,5 @@
 from lift_run import lift, run
+from event import Event
 import heapq
 import numpy as np
 
@@ -8,17 +9,6 @@ class Skier:
   def __init__(self):
     self.time_in_line = 0
     self.time_on_lift = 0
-
-class Event:
-  def __init__(self, time, etype, obj, skier=None):
-    self.time = time
-    self.etype = etype      # "RESORT_ARRIVAL", "LIFT_DEPART", "RUN_FINISH"
-    self.obj = obj          # Lift or Run or None
-    self.skier = skier      # Skier
-
-def generateInterArrival(mean):
-    """Function to generate exponential random variates."""
-    return -mean * np.log(np.random.uniform(0, 1))
 
 def main():
   # Initialize the system
@@ -146,7 +136,7 @@ def main():
       heapq.heappush(event_queue, event)
 
   # initialize with first resort arrival
-  arrival_dt = generateInterArrival(LAMBDA)
+  arrival_dt = Event.generateInterArrival(LAMBDA)
   schedule(Event((sim_time + arrival_dt), "RESORT_ARRIVAL", None, None))
 
   # Loop until we hit a specified time on the simulation clock (Resort Closing Time)
@@ -161,7 +151,7 @@ def main():
       skier = Skier()
         
       # schedule next resort arrival
-      inter = generateInterArrival(LAMBDA)
+      inter = Event.generateInterArrival(LAMBDA)
       schedule(Event(current_time + inter, "RESORT_ARRIVAL", None, None))
 
     elif ev.etype == "LIFT_DEPART":
@@ -175,9 +165,6 @@ def main():
     # Time average statistics
 
     # Invoke next event function
-
-
-    
 
   # Output results
   pass
