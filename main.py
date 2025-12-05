@@ -33,9 +33,6 @@ def main():
       # create skier and send to random entry lift
       new_skier = Skier(arrival_time=current_time)
       # print(f"Skier {new_skier.id} arrives at resort {current_time:.2f} minutes")
-      
-      # TODO: Make resort arrival NSPP, This high at beginning of the day and tapers off.
-      # Becomes zero at close time and loop ends once event queue is empty.
 
       # schedule next resort arrival
       inter = Event.generateInterArrival(get_nspp_rate(current_time))

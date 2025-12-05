@@ -17,8 +17,8 @@ class Lift:
         self.incoming_runs: list[Run] = incoming_runs
         self.outgoing_runs: list[Run] = outgoing_runs
 
-        self.queue = []
-        self.skiers_in_service = None
+        self.queue: list[Skier] = []
+        self.skiers_in_service: list[Skier] = []
 
     # need a function to choose next run
     def choose_run(self) -> Run | None:
@@ -42,41 +42,45 @@ class Lift:
         skier.enter_queue(current_time)  # Track when skier enters queue
         self.queue.append(skier)
 
-        if self.skiers_in_service is None:
-            # No one is in queue
+        if len(self.skiers_in_service) == 0:
+            # No one is currently on the lift
             self.start_service(current_time, schedule)
-        # else:
-        #     # Skier need to wait in line
-        #     # TODO: implement wait logic
-
-        #     print(f"{self.name} Full")
-        #     pass
 
     def start_service(self, current_time: float, schedule: Callable[[Event], None]) -> None:
-        # Serves the next skier in line
-        # TODO: Update this with the capacity logic
+        # Serves multiple skiers at once (up to capacity)
         if not self.queue:
+            print(f"Error: No skiers in queue to start lift {self.name}")
             return
-        self.skiers_in_service = self.queue.pop(0)
-        self.skiers_in_service.start_lift(current_time)  # Track when skier starts lift ride
-        # print(f"{self.name} Serving Skier {self.skiers_in_service.id} at {current_time:.2f} minutes")
+        
+        # Load multiple skiers onto the lift at once
+        num_to_load = min(self.lift_capacity, len(self.queue))
+        for _ in range(num_to_load):
+            skier = self.queue.pop(0)
+            self.skiers_in_service.append(skier)
+            skier.start_lift(current_time)  # Track when skier starts lift ride
+
+
+        # Schedule a single depart event for all skiers on the lift
         depart_time = current_time + self.lift_speed
         schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
 
     def handle_departure(self, current_time: float, schedule: Callable[[Event], None]) -> None:
-        skier = self.skiers_in_service
-        skier.finish_lift(current_time)  # Track when skier finishes lift ride
-        self.skiers_in_service = None
-
-        # print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")
+        # Depart all skiers currently on the lift
+        departing_skiers = self.skiers_in_service.copy()
+        self.skiers_in_service.clear()
         
-        run = self.choose_run()
-        if run is None:
-            print("Error: No run chosen from lift")
-            return
-
-        run.handle_run_start(current_time, skier, schedule)
-
-        if self.queue != []:
+        # Each skier chooses their own run and starts skiing
+        for skier in departing_skiers:
+            skier.finish_lift(current_time)  # Track when skier finishes lift ride
+            
+            run = self.choose_run()
+            if run is None:
+                print("Error: No run chosen from lift")
+                continue
+            
+            run.handle_run_start(current_time, skier, schedule)
+        
+        # If there are skiers waiting, start the next lift ride
+        if self.queue:
             self.start_service(current_time, schedule)
     
