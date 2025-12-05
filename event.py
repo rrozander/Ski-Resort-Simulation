@@ -4,8 +4,9 @@ import numpy as np
 class Event:
   class EventType(Enum):
     RESORT_ARRIVAL = 1
-    LIFT_DEPART = 2
-    RUN_FINISH = 3
+    LIFT_START = 2
+    LIFT_DEPART = 3
+    RUN_FINISH = 4
 
   def __init__(self, time: float, etype: EventType, obj, skier=None):
     self.time = time

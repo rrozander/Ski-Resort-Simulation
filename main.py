@@ -43,6 +43,11 @@ def main():
       entry_lift: Lift = np.random.choice(entry_lifts)
       entry_lift.handle_arrival(current_time, new_skier, lambda e: schedule(event_queue, e))
 
+    elif ev.etype == Event.EventType.LIFT_START:
+      # call start_service method of lift
+      lift: Lift = ev.obj
+      lift.start_service(current_time, lambda e: schedule(event_queue, e))
+
     elif ev.etype == Event.EventType.LIFT_DEPART:
       # call depart method of lift
       lift: Lift = ev.obj 

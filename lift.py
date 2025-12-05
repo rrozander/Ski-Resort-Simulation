@@ -13,7 +13,7 @@ class Lift:
         self.name = name
         self.lift_capacity = capacity
         self.lift_speed = speed # How long it takes to ride the lift - in minutes
-        self.lift_wait_time: float = 0 # Wait for a lift to arrive + pick people up - in minutes
+        self.lift_wait_time: float = 0.5 # Wait for a lift to arrive + pick people up - in minutes <- chair every 30 sec
         self.incoming_runs: list[Run] = incoming_runs
         self.outgoing_runs: list[Run] = outgoing_runs
 
@@ -43,13 +43,14 @@ class Lift:
         self.queue.append(skier)
 
         if len(self.skiers_in_service) == 0:
-            # No one is currently on the lift
-            self.start_service(current_time, schedule)
+            # No one is currently on the lift, schedule the next chair to arrive
+            service_time = current_time + self.lift_wait_time
+            schedule(Event(service_time, Event.EventType.LIFT_START, self, None))
 
     def start_service(self, current_time: float, schedule: Callable[[Event], None]) -> None:
         # Serves multiple skiers at once (up to capacity)
         if not self.queue:
-            print(f"Error: No skiers in queue to start lift {self.name}")
+            # No skiers waiting, but don't schedule another chair yet
             return
         
         # Load multiple skiers onto the lift at once
@@ -63,6 +64,10 @@ class Lift:
         # Schedule a single depart event for all skiers on the lift
         depart_time = current_time + self.lift_speed
         schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
+        
+        # Schedule the next chair to arrive after lift_wait_time
+        next_chair_time = current_time + self.lift_wait_time
+        schedule(Event(next_chair_time, Event.EventType.LIFT_START, self, None))
 
     def handle_departure(self, current_time: float, schedule: Callable[[Event], None]) -> None:
         # Depart all skiers currently on the lift
@@ -79,8 +84,4 @@ class Lift:
                 continue
             
             run.handle_run_start(current_time, skier, schedule)
-        
-        # If there are skiers waiting, start the next lift ride
-        if self.queue:
-            self.start_service(current_time, schedule)
     
