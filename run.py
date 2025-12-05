@@ -11,7 +11,7 @@ class Run:
         self.name = name
         self.avg_run_time = avg_time # average time to complete the run - in minutes
         self.percentage_traffic = chance_to_take
-        self.next_lift: Lift | None = None
+        self.dest_lift: Lift | None = None
 
     def handle_run_start(self, current_time: float, skier: Skier, schedule: callable) -> None:
         if self.avg_run_time <= 0:
@@ -24,9 +24,9 @@ class Run:
         schedule(Event(finish_time, Event.EventType.RUN_FINISH, self, skier))
 
     def handle_run_finish(self, current_time: float, skier: Skier, schedule: callable) -> None:
-        if self.next_lift is not None:
+        if self.dest_lift is not None:
             # print(f"Skier {skier.id} finishing run {self.name} at {current_time:.2f} minutes")
-            self.next_lift.handle_arrival(current_time, skier, schedule)
+            self.dest_lift.handle_arrival(current_time, skier, schedule)
         else:
             # skier leaves resort
             skier.leave_resort(current_time)  # Track when skier leaves resort

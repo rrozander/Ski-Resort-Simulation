@@ -94,12 +94,31 @@ def get_nspp_rate(current_time: float) -> float:
 
 
 def print_stats():
-  skiers = sorted(Skier.skiers_processed, key=lambda skier: skier.id)
+  skiers: list[Skier] = sorted(Skier.skiers_processed, key=lambda skier: skier.id)
 
-  print(f"Total skiers processed: {len(skiers)}")
+
+  avg_total_time = np.mean([skier.get_total_time_at_resort() for skier in skiers])
+  avg_wait_time = np.mean([skier.get_stats()['time_waiting_in_line'] for skier in skiers])
+  avg_lift_time = np.mean([skier.get_stats()['time_on_lift'] for skier in skiers])
+  avg_ski_time = np.mean([skier.get_stats()['time_skiing'] for skier in skiers])
+  avg_runs = np.mean([skier.get_stats()['number_of_runs'] for skier in skiers])
+
   for skier in skiers:
     stats = skier.get_stats()
-    print(f"Skier {stats['id']}: Total time: {stats['total_time_at_resort']:.2f} min, Wait time: {stats['time_waiting_in_line']:.2f} min, Lift time: {stats['time_on_lift']:.2f} min, Skiing time: {stats['time_skiing']:.2f} min")
+    print(f"Skier {stats['id']}: " + 
+          f"Total time: {stats['total_time_at_resort']:.2f} min, " + 
+          f"Wait time: {stats['time_waiting_in_line']:.2f} min, " + 
+          f"Lift time: {stats['time_on_lift']:.2f} min, " + 
+          f"Skiing time: {stats['time_skiing']:.2f} min, " +
+          f"Number of runs: {stats['number_of_runs']}")
+
+  print(f"Total skiers processed: {len(skiers)}")
+  print(f"Average total time at resort: {avg_total_time:.2f} minutes")
+  print(f"Average wait time in line: {avg_wait_time:.2f} minutes")
+  print(f"Average time on lifts: {avg_lift_time:.2f} minutes")
+  print(f"Average time skiing: {avg_ski_time:.2f} minutes")
+  print(f"Average number of runs completed: {avg_runs:.2f}")
+
 
 
 def initialize_runs_and_lifts():
@@ -107,27 +126,27 @@ def initialize_runs_and_lifts():
   run_E_W = Run(name="E_W", avg_time=0.5, chance_to_take=0.1)
   run_E_H = Run(name="E_H", avg_time=3.5, chance_to_take=0.15)
   run_E_BB = Run(name="E_BB", avg_time=12.5, chance_to_take=0.1)
-  run_E_S = Run(name="E_S", avg_time=7.5, chance_to_take=0.15)
+  run_E_S = Run(name="E_S", avg_time=7.5, chance_to_take=0.2) # Updated from 15%
   run_E_E = Run(name="E_E", avg_time=7.5, chance_to_take=0.4)
-  run_E_Out = Run(name="E_Out", avg_time=0, chance_to_take=0.1)
+  run_E_Out = Run(name="E_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
   run_W_E = Run(name="W_E", avg_time=0.5, chance_to_take=0.25)
-  run_W_S = Run(name="W_S", avg_time=6, chance_to_take=0.15)
+  run_W_S = Run(name="W_S", avg_time=6, chance_to_take=0.2) # Updated from 15%
   run_W_H = Run(name="W_H", avg_time=4, chance_to_take=0.15)
   run_W_W = Run(name="W_W", avg_time=5, chance_to_take=0.35)
-  run_W_Out = Run(name="W_Out", avg_time=0, chance_to_take=0.1)
+  run_W_Out = Run(name="W_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
   run_S_S = Run(name="S_S", avg_time=8, chance_to_take=0.4)
-  run_S_W = Run(name="S_W", avg_time=6, chance_to_take=0.1)
+  run_S_W = Run(name="S_W", avg_time=6, chance_to_take=0.15) # Updated from 10%
   run_S_E = Run(name="S_E", avg_time=6.5, chance_to_take=0.25)
   run_S_H = Run(name="S_H", avg_time=10, chance_to_take=0.15)
-  run_S_Out = Run(name="S_Out", avg_time=0, chance_to_take=0.1)
+  run_S_Out = Run(name="S_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
   run_H_H = Run(name="H_H", avg_time=7, chance_to_take=0.5)
-  run_H_E = Run(name="H_E", avg_time=5, chance_to_take=0.2)
+  run_H_E = Run(name="H_E", avg_time=5, chance_to_take=0.25) # Updated from 20%
   run_H_W = Run(name="H_W", avg_time=5.5, chance_to_take=0.05)
   run_H_BF = Run(name="H_BF", avg_time=2.5, chance_to_take=0.15)
-  run_H_Out = Run(name="H_Out", avg_time=0, chance_to_take=0.1)
+  run_H_Out = Run(name="H_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
   run_BF_BF = Run(name="BF_BF", avg_time=5, chance_to_take=0.1)
   run_BF_H = Run(name="BF_H", avg_time=10, chance_to_take=0.15)

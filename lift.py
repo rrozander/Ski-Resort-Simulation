@@ -18,7 +18,7 @@ class Lift:
         self.outgoing_runs: list[Run] = outgoing_runs
 
         self.queue: list[Skier] = []
-        self.skiers_in_service: list[Skier] = []
+        self.skiers_in_service: list[list[Skier]] = [] # Each element is a group of skiers on a chair
 
     # need a function to choose next run
     def choose_run(self) -> Run | None:
@@ -32,6 +32,8 @@ class Lift:
 
         # error check
         if (len(weights) != len(self.outgoing_runs)) or weight_sum != 1:
+            print("Error: Weights do not sum to 1 or length mismatch")
+            print(f"Weights: {weights}, Sum: {weight_sum}, Outgoing runs: {len(self.outgoing_runs)}")
             return None
 
         # make choice
@@ -55,10 +57,12 @@ class Lift:
         
         # Load multiple skiers onto the lift at once
         num_to_load = min(self.lift_capacity, len(self.queue))
+        skiers_loaded = []
         for _ in range(num_to_load):
             skier = self.queue.pop(0)
-            self.skiers_in_service.append(skier)
+            skiers_loaded.append(skier)
             skier.start_lift(current_time)  # Track when skier starts lift ride
+        self.skiers_in_service.append(skiers_loaded)
 
 
         # Schedule a single depart event for all skiers on the lift
@@ -71,8 +75,7 @@ class Lift:
 
     def handle_departure(self, current_time: float, schedule: Callable[[Event], None]) -> None:
         # Depart all skiers currently on the lift
-        departing_skiers = self.skiers_in_service.copy()
-        self.skiers_in_service.clear()
+        departing_skiers = self.skiers_in_service.pop(0) # Remove the oldest group of skiers on the lift
         
         # Each skier chooses their own run and starts skiing
         for skier in departing_skiers:

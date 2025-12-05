@@ -12,6 +12,7 @@ class Skier:
     self.departure_time = None  # When the skier left the resort
     self.time_in_line = 0.0  # Total time waiting in lift queues
     self.time_on_lift = 0.0  # Total time riding lifts
+    self.number_of_runs = 0  # Total number of runs completed
     
     # Temporary tracking variables
     self.current_queue_entry_time = None  # When skier entered current queue
@@ -35,6 +36,7 @@ class Skier:
       # Add the ride time to total
       self.time_on_lift += current_time - self.current_lift_start_time
       self.current_lift_start_time = None
+    self.number_of_runs += 1
   
   def leave_resort(self, current_time: float) -> None:
     """Called when skier exits the resort."""
@@ -56,6 +58,7 @@ class Skier:
       'time_on_lift': self.time_on_lift,
       'time_skiing': self.get_total_time_at_resort() - (self.time_in_line + self.time_on_lift),
       'arrival_time': self.arrival_time,
-      'departure_time': self.departure_time
+      'departure_time': self.departure_time,
+      'number_of_runs': self.number_of_runs
     }
 
