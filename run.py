@@ -28,6 +28,8 @@ class Run:
             print(f"Skier {skier.id} finishing run {self.name} at {current_time:.2f} minutes")
             self.next_lift.handle_arrival(current_time, skier, schedule)
         else:
-            # skier leaves resort; you can store exit time on skier if you want
+            # skier leaves resort
+            skier.leave_resort(current_time)  # Track when skier leaves resort
             print(f"Skier {skier.id} exits resort at {current_time:.2f} minutes")
-            pass
+            stats = skier.get_stats()
+            print(f"  Stats - Total time: {stats['total_time_at_resort']:.2f} min, Wait time: {stats['time_waiting_in_line']:.2f} min, Lift time: {stats['time_on_lift']:.2f} min")

@@ -39,6 +39,7 @@ class Lift:
         return run_choice
 
     def handle_arrival(self, current_time: float, skier: Skier, schedule: Callable[[Event], None]) -> None:
+        skier.enter_queue(current_time)  # Track when skier enters queue
         self.queue.append(skier)
 
         if self.skiers_in_service is None:
@@ -57,12 +58,14 @@ class Lift:
         if not self.queue:
             return
         self.skiers_in_service = self.queue.pop(0)
+        self.skiers_in_service.start_lift(current_time)  # Track when skier starts lift ride
         print(f"{self.name} Serving Skier {self.skiers_in_service.id} at {current_time:.2f} minutes")
         depart_time = current_time + self.lift_speed
         schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
 
     def handle_departure(self, current_time: float, schedule: Callable[[Event], None]) -> None:
         skier = self.skiers_in_service
+        skier.finish_lift(current_time)  # Track when skier finishes lift ride
         self.skiers_in_service = None
 
         print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")

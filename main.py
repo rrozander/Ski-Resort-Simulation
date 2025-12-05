@@ -8,7 +8,7 @@ import numpy as np
 
 np.random.seed(3)
 
-CLOSE_TIME = 1 * 30.0
+CLOSE_TIME = 3 * 60.0
 LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
@@ -33,8 +33,8 @@ def main():
 
     if ev.etype == Event.EventType.RESORT_ARRIVAL:
       # create skier and send to random entry lift
-      new_skier = Skier()
-      print(f"Skier {new_skier.id} arrives at resort {current_time:.2f} minutes")
+      new_skier = Skier(arrival_time=current_time)
+      # print(f"Skier {new_skier.id} arrives at resort {current_time:.2f} minutes")
       
       # schedule next resort arrival
       inter = Event.generateInterArrival(LAMBDA)
