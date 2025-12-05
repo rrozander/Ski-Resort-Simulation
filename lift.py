@@ -59,7 +59,7 @@ class Lift:
             return
         self.skiers_in_service = self.queue.pop(0)
         self.skiers_in_service.start_lift(current_time)  # Track when skier starts lift ride
-        print(f"{self.name} Serving Skier {self.skiers_in_service.id} at {current_time:.2f} minutes")
+        # print(f"{self.name} Serving Skier {self.skiers_in_service.id} at {current_time:.2f} minutes")
         depart_time = current_time + self.lift_speed
         schedule(Event(depart_time, Event.EventType.LIFT_DEPART, self, None))
 
@@ -68,7 +68,7 @@ class Lift:
         skier.finish_lift(current_time)  # Track when skier finishes lift ride
         self.skiers_in_service = None
 
-        print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")
+        # print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")
         
         run = self.choose_run()
         if run is None:

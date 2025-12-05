@@ -1,6 +1,7 @@
 class Skier:
   # this is a class to keep track of a skiers stats
   curr_id = 0
+  skiers_processed = []
 
   def __init__(self, arrival_time: float = 0.0):
     self.id = Skier.curr_id
@@ -38,6 +39,7 @@ class Skier:
   def leave_resort(self, current_time: float) -> None:
     """Called when skier exits the resort."""
     self.departure_time = current_time
+    Skier.skiers_processed.append(self)
   
   def get_total_time_at_resort(self) -> float:
     """Returns total time spent at the resort."""
@@ -52,6 +54,7 @@ class Skier:
       'total_time_at_resort': self.get_total_time_at_resort(),
       'time_waiting_in_line': self.time_in_line,
       'time_on_lift': self.time_on_lift,
+      'time_skiing': self.get_total_time_at_resort() - (self.time_in_line + self.time_on_lift),
       'arrival_time': self.arrival_time,
       'departure_time': self.departure_time
     }

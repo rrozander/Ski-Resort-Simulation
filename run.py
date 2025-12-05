@@ -19,17 +19,17 @@ class Run:
             self.handle_run_finish(current_time, skier, schedule)
             return
         run_time = Event.generateInterArrival(self.avg_run_time)
-        print(f"Skier {skier.id} starting run {self.name} at {current_time:.2f} minutes for estimated {run_time:.2f} minutes")
+        # print(f"Skier {skier.id} starting run {self.name} at {current_time:.2f} minutes for estimated {run_time:.2f} minutes")
         finish_time = current_time + run_time
         schedule(Event(finish_time, Event.EventType.RUN_FINISH, self, skier))
 
     def handle_run_finish(self, current_time: float, skier: Skier, schedule: callable) -> None:
         if self.next_lift is not None:
-            print(f"Skier {skier.id} finishing run {self.name} at {current_time:.2f} minutes")
+            # print(f"Skier {skier.id} finishing run {self.name} at {current_time:.2f} minutes")
             self.next_lift.handle_arrival(current_time, skier, schedule)
         else:
             # skier leaves resort
             skier.leave_resort(current_time)  # Track when skier leaves resort
-            print(f"Skier {skier.id} exits resort at {current_time:.2f} minutes")
+
             stats = skier.get_stats()
-            print(f"  Stats - Total time: {stats['total_time_at_resort']:.2f} min, Wait time: {stats['time_waiting_in_line']:.2f} min, Lift time: {stats['time_on_lift']:.2f} min")
+            # print(f"  Stats - Total time: {stats['total_time_at_resort']:.2f} min, Wait time: {stats['time_waiting_in_line']:.2f} min, Lift time: {stats['time_on_lift']:.2f} min")

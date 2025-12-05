@@ -8,8 +8,8 @@ import numpy as np
 
 np.random.seed(3)
 
-CLOSE_TIME = 3 * 60.0
-LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
+CLOSE_TIME = 6.5 * 60.0 # 9am to 3:30 pm = 6.5 hours = 390 minutes
+# LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
   # Initialize the system
@@ -19,7 +19,7 @@ def main():
   entry_lifts: list[Lift] = initialize_runs_and_lifts()
 
   # Initialize with first resort arrival
-  arrival_dt = Event.generateInterArrival(LAMBDA)
+  arrival_dt = Event.generateInterArrival(get_nspp_rate(sim_time))
   schedule(event_queue, Event((sim_time + arrival_dt), Event.EventType.RESORT_ARRIVAL, None, None))
 
   print("Starting simulation")
@@ -28,16 +28,17 @@ def main():
   while event_queue:
     ev: Event = heapq.heappop(event_queue)
     current_time = ev.time
-    if current_time > CLOSE_TIME:
-      break
 
     if ev.etype == Event.EventType.RESORT_ARRIVAL:
       # create skier and send to random entry lift
       new_skier = Skier(arrival_time=current_time)
       # print(f"Skier {new_skier.id} arrives at resort {current_time:.2f} minutes")
       
+      # TODO: Make resort arrival NSPP, This high at beginning of the day and tapers off.
+      # Becomes zero at close time and loop ends once event queue is empty.
+
       # schedule next resort arrival
-      inter = Event.generateInterArrival(LAMBDA)
+      inter = Event.generateInterArrival(get_nspp_rate(current_time))
       schedule(event_queue, Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
 
       # Send to entry lift
@@ -61,15 +62,43 @@ def main():
     # Time average statistics
 
     # Invoke next event function
-  # Output results
-  print("Simulation complete")
-  pass
+  print_stats()
 
+  print("Simulation complete")
 
 
 def schedule(event_queue: list[Event], new_event: Event) -> None:
   if new_event.time <= CLOSE_TIME:
     heapq.heappush(event_queue, new_event)
+
+
+def get_nspp_rate(current_time: float) -> float:
+  """Non-stationary Poisson Process rate function for resort arrivals."""
+
+  # Best guess at arrival rates, we can adjust as needed
+
+  if current_time < 60.0:
+    return 1 / 0.2  # High arrival rate in first hour
+  elif current_time < 120.0:
+    return 1 / 0.5
+  elif current_time < 240.0:
+    return 1 / 1.0
+  elif current_time < 300.0:
+    return 1 / 2.0
+  elif current_time < CLOSE_TIME:
+    return 1 / 5.0  # Low arrival rate before closing
+  else:
+    return 0.0
+
+
+def print_stats():
+  skiers = sorted(Skier.skiers_processed, key=lambda skier: skier.id)
+
+  print(f"Total skiers processed: {len(skiers)}")
+  for skier in skiers:
+    stats = skier.get_stats()
+    print(f"Skier {stats['id']}: Total time: {stats['total_time_at_resort']:.2f} min, Wait time: {stats['time_waiting_in_line']:.2f} min, Lift time: {stats['time_on_lift']:.2f} min, Skiing time: {stats['time_skiing']:.2f} min")
+
 
 def initialize_runs_and_lifts():
   # create all runs
