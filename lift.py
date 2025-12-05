@@ -68,9 +68,11 @@ class Lift:
         print(f"{self.name} Departing Skier {skier.id} at {current_time:.2f} minutes")
         
         run = self.choose_run()
-        # need some error handling here
-        # TODO Implement run start
-        # run.handle_run_start(current_time, skier, schedule)
+        if run is None:
+            print("Error: No run chosen from lift")
+            return
+
+        run.handle_run_start(current_time, skier, schedule)
 
         if self.queue != []:
             self.start_service(current_time, schedule)

@@ -8,7 +8,7 @@ import numpy as np
 
 np.random.seed(3)
 
-CLOSE_TIME = 1 * 60.0
+CLOSE_TIME = 1 * 30.0
 LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
@@ -54,12 +54,15 @@ def main():
     elif ev.etype == Event.EventType.RUN_FINISH:
       # call depart function of run
       # print(f"Run finish at time {current_time:.2f} minutes")
-      pass
+      run: Run = ev.obj
+
+      run.handle_run_finish(current_time, ev.skier, lambda e: schedule(event_queue, e))
     
     # Time average statistics
 
     # Invoke next event function
   # Output results
+  print("Simulation complete")
   pass
 
 
@@ -70,39 +73,39 @@ def schedule(event_queue: list[Event], new_event: Event) -> None:
 
 def initialize_runs_and_lifts():
   # create all runs
-  run_E_W = Run(avg_time=0.5, chance_to_take=0.1)
-  run_E_H = Run(avg_time=3.5, chance_to_take=0.15)
-  run_E_BB = Run(avg_time=12.5, chance_to_take=0.1)
-  run_E_S = Run(avg_time=7.5, chance_to_take=0.15)
-  run_E_E = Run(avg_time=7.5, chance_to_take=0.4)
-  run_E_Out = Run(avg_time=0, chance_to_take=0.1)
+  run_E_W = Run(name="E_W", avg_time=0.5, chance_to_take=0.1)
+  run_E_H = Run(name="E_H", avg_time=3.5, chance_to_take=0.15)
+  run_E_BB = Run(name="E_BB", avg_time=12.5, chance_to_take=0.1)
+  run_E_S = Run(name="E_S", avg_time=7.5, chance_to_take=0.15)
+  run_E_E = Run(name="E_E", avg_time=7.5, chance_to_take=0.4)
+  run_E_Out = Run(name="E_Out", avg_time=0, chance_to_take=0.1)
 
-  run_W_E = Run(avg_time=0.5, chance_to_take=0.25)
-  run_W_S = Run(avg_time=6, chance_to_take=0.15)
-  run_W_H = Run(avg_time=4, chance_to_take=0.15)
-  run_W_W = Run(avg_time=5, chance_to_take=0.35)
-  run_W_Out = Run(avg_time=0, chance_to_take=0.1)
+  run_W_E = Run(name="W_E", avg_time=0.5, chance_to_take=0.25)
+  run_W_S = Run(name="W_S", avg_time=6, chance_to_take=0.15)
+  run_W_H = Run(name="W_H", avg_time=4, chance_to_take=0.15)
+  run_W_W = Run(name="W_W", avg_time=5, chance_to_take=0.35)
+  run_W_Out = Run(name="W_Out", avg_time=0, chance_to_take=0.1)
 
-  run_S_S = Run(avg_time=8, chance_to_take=0.4)
-  run_S_W = Run(avg_time=6, chance_to_take=0.1)
-  run_S_E = Run(avg_time=6.5, chance_to_take=0.25)
-  run_S_H = Run(avg_time=10, chance_to_take=0.15)
-  run_S_Out = Run(avg_time=0, chance_to_take=0.1)
+  run_S_S = Run(name="S_S", avg_time=8, chance_to_take=0.4)
+  run_S_W = Run(name="S_W", avg_time=6, chance_to_take=0.1)
+  run_S_E = Run(name="S_E", avg_time=6.5, chance_to_take=0.25)
+  run_S_H = Run(name="S_H", avg_time=10, chance_to_take=0.15)
+  run_S_Out = Run(name="S_Out", avg_time=0, chance_to_take=0.1)
 
-  run_H_H = Run(avg_time=7, chance_to_take=0.5)
-  run_H_E = Run(avg_time=5, chance_to_take=0.2)
-  run_H_W = Run(avg_time=5.5, chance_to_take=0.05)
-  run_H_BF = Run(avg_time=2.5, chance_to_take=0.15)
-  run_H_Out = Run(avg_time=0, chance_to_take=0.1)
+  run_H_H = Run(name="H_H", avg_time=7, chance_to_take=0.5)
+  run_H_E = Run(name="H_E", avg_time=5, chance_to_take=0.2)
+  run_H_W = Run(name="H_W", avg_time=5.5, chance_to_take=0.05)
+  run_H_BF = Run(name="H_BF", avg_time=2.5, chance_to_take=0.15)
+  run_H_Out = Run(name="H_Out", avg_time=0, chance_to_take=0.1)
 
-  run_BF_BF = Run(avg_time=5, chance_to_take=0.1)
-  run_BF_H = Run(avg_time=10, chance_to_take=0.15)
-  run_BF_BB = Run(avg_time=10, chance_to_take=0.75)
+  run_BF_BF = Run(name="BF_BF", avg_time=5, chance_to_take=0.1)
+  run_BF_H = Run(name="BF_H", avg_time=10, chance_to_take=0.15)
+  run_BF_BB = Run(name="BF_BB", avg_time=10, chance_to_take=0.75)
 
-  run_BB_BB = Run(avg_time=10, chance_to_take=0.55)
-  run_BB_BF = Run(avg_time=5, chance_to_take=0.1) 
-  run_BB_E = Run(avg_time=7.5, chance_to_take=0.2)
-  run_BB_H = Run(avg_time=7.5, chance_to_take=0.15)
+  run_BB_BB = Run(name="BB_BB", avg_time=10, chance_to_take=0.55)
+  run_BB_BF = Run(name="BB_BF", avg_time=5, chance_to_take=0.1) 
+  run_BB_E = Run(name="BB_E", avg_time=7.5, chance_to_take=0.2)
+  run_BB_H = Run(name="BB_H", avg_time=7.5, chance_to_take=0.15)
 
   # create all lifts
   lift_E = Lift(
