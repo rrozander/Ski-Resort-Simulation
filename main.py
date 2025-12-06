@@ -64,14 +64,24 @@ def main():
     # Time average statistics
 
     # Invoke next event function
+  
+  # Process any skiers still in the system at simulation end
+  final_time = current_time if event_queue else CLOSE_TIME
+  for skier in Skier.all_skiers:
+    if skier.departure_time is None:
+      skier.leave_resort(final_time)
+  
   print_stats()
 
   print("Simulation complete")
 
 
 def schedule(event_queue: list[Event], new_event: Event) -> None:
-  if new_event.time <= CLOSE_TIME:
-    heapq.heappush(event_queue, new_event)
+  """Schedules a new event by adding it to the event queue."""
+  # Only prevent new arrivals after closing time - let all other events complete
+  if new_event.etype == Event.EventType.RESORT_ARRIVAL and new_event.time > CLOSE_TIME:
+    return
+  heapq.heappush(event_queue, new_event)
 
 
 def get_nspp_rate(current_time: float) -> float:
@@ -87,14 +97,15 @@ def get_nspp_rate(current_time: float) -> float:
     return 1 / 1.0
   elif current_time < 300.0:
     return 1 / 2.0
-  elif current_time < CLOSE_TIME:
+  elif current_time < CLOSE_TIME- 30.0:
     return 1 / 5.0  # Low arrival rate before closing
   else:
-    return 0.0
+    return 0.0 # No arrivals in last 30 minutes
 
 
 def print_stats():
-  skiers: list[Skier] = sorted(Skier.skiers_processed, key=lambda skier: skier.id)
+  # Use all_skiers instead of just skiers_processed to include everyone
+  skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.id)
 
 
   avg_total_time = np.mean([skier.get_total_time_at_resort() for skier in skiers])

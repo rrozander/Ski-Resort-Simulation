@@ -30,8 +30,8 @@ class Lift:
             weights.append(weight)
             weight_sum += weight
 
-        # error check
-        if (len(weights) != len(self.outgoing_runs)) or weight_sum != 1:
+        # error check - use tolerance for floating point comparison
+        if (len(weights) != len(self.outgoing_runs)) or not np.isclose(weight_sum, 1.0, atol=1e-4):
             print("Error: Weights do not sum to 1 or length mismatch")
             print(f"Weights: {weights}, Sum: {weight_sum}, Outgoing runs: {len(self.outgoing_runs)}")
             return None
@@ -40,7 +40,15 @@ class Lift:
         run_choice = np.random.choice(self.outgoing_runs, p=weights)
         return run_choice
 
-    def handle_arrival(self, current_time: float, skier: Skier, schedule: Callable[[Event], None]) -> None:
+    def handle_arrival(self, current_time: float, skier: Skier, schedule: Callable[[Event], None], close_time: float = float('inf')) -> None:
+        # Import here to avoid circular dependency
+        from main import CLOSE_TIME
+        
+        # If at or after closing time, skier leaves resort instead of queueing
+        if current_time >= CLOSE_TIME:
+            skier.leave_resort(current_time)
+            return
+        
         skier.enter_queue(current_time)  # Track when skier enters queue
         self.queue.append(skier)
 
@@ -49,7 +57,7 @@ class Lift:
             service_time = current_time + self.lift_wait_time
             schedule(Event(service_time, Event.EventType.LIFT_START, self, None))
 
-    def start_service(self, current_time: float, schedule: Callable[[Event], None]) -> None:
+    def start_service(self, current_time: float, schedule: Callable[[Event], None]) -> None:    
         # Serves multiple skiers at once (up to capacity)
         if not self.queue:
             # No skiers waiting, but don't schedule another chair yet

@@ -20,4 +20,7 @@ class Event:
 
   def generateInterArrival(mean: float) -> float:
     """Function to generate exponential random variates."""
+    if mean == 0.0:
+      return float('inf')  # No arrivals
+    
     return -mean * np.log(np.random.uniform(0, 1))
