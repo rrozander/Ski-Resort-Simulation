@@ -5,6 +5,7 @@ from skier import Skier
 from event import Event
 import heapq
 import numpy as np
+import matplotlib.pyplot as plt
 
 np.random.seed(3)
 
@@ -129,6 +130,17 @@ def print_stats():
   print(f"Average time on lifts: {avg_lift_time:.2f} minutes")
   print(f"Average time skiing: {avg_ski_time:.2f} minutes")
   print(f"Average number of runs completed: {avg_runs:.2f}")
+
+  # Create histogram of runs per skier
+  runs = [skier.get_stats()['number_of_runs'] for skier in skiers]
+  
+  plt.figure(figsize=(10, 6))
+  plt.hist(runs, bins=range(min(runs), max(runs) + 2), align='left', rwidth=0.8, edgecolor='black')
+  plt.title('Distribution of Runs per Skier')
+  plt.xlabel('Number of Runs')
+  plt.ylabel('Number of Skiers')
+  plt.grid(axis='y', alpha=0.75)
+  plt.savefig('histograms/skier_runs_histogram.png')
 
 
 
