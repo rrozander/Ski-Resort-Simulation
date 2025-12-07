@@ -105,7 +105,7 @@ def get_nspp_rate(current_time: float) -> float:
 
 def print_stats():
   # Use all_skiers instead of just skiers_processed to include everyone
-  skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.id)
+  skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.get_stats()['number_of_runs'], reverse=True)
 
 
   avg_total_time = np.mean([skier.get_total_time_at_resort() for skier in skiers])
@@ -114,14 +114,14 @@ def print_stats():
   avg_ski_time = np.mean([skier.get_stats()['time_skiing'] for skier in skiers])
   avg_runs = np.mean([skier.get_stats()['number_of_runs'] for skier in skiers])
 
-  for skier in skiers:
-    stats = skier.get_stats()
-    print(f"Skier {stats['id']}: " + 
-          f"Total time: {stats['total_time_at_resort']:.2f} min, " + 
-          f"Wait time: {stats['time_waiting_in_line']:.2f} min, " + 
-          f"Lift time: {stats['time_on_lift']:.2f} min, " + 
-          f"Skiing time: {stats['time_skiing']:.2f} min, " +
-          f"Number of runs: {stats['number_of_runs']}")
+  # for skier in skiers:
+  #   stats = skier.get_stats()
+  #   print(f"Skier {stats['id']}: " + 
+  #         f"Total time: {stats['total_time_at_resort']:.2f} min, " + 
+  #         f"Wait time: {stats['time_waiting_in_line']:.2f} min, " + 
+  #         f"Lift time: {stats['time_on_lift']:.2f} min, " + 
+  #         f"Skiing time: {stats['time_skiing']:.2f} min, " +
+  #         f"Number of runs: {stats['number_of_runs']}")
 
   print(f"Total skiers processed: {len(skiers)}")
   print(f"Average total time at resort: {avg_total_time:.2f} minutes")

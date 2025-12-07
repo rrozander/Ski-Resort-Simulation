@@ -21,23 +21,36 @@ class Lift:
         self.skiers_in_service: list[list[Skier]] = [] # Each element is a group of skiers on a chair
 
     # need a function to choose next run
-    def choose_run(self) -> Run | None:
+    def choose_run(self, number_of_runs: int) -> Run | None:
+        # Filter out runs ending in "_Out" if skier has completed <= 2 runs
+        if number_of_runs <= 2:
+            available_runs = [run for run in self.outgoing_runs if not run.name.endswith("_Out")]
+        else:
+            available_runs = self.outgoing_runs
+        
+        # If no runs available after filtering, fall back to all runs
+        if not available_runs:
+            available_runs = self.outgoing_runs
+        
         # first get array of weights
         weights = []
         weight_sum = 0
-        for ski_run in self.outgoing_runs:   # outgoing_runs is your list of Run objects
+        for ski_run in available_runs:   # outgoing_runs is your list of Run objects
             weight = ski_run.percentage_traffic
             weights.append(weight)
             weight_sum += weight
 
-        # error check - use tolerance for floating point comparison
-        if (len(weights) != len(self.outgoing_runs)) or not np.isclose(weight_sum, 1.0, atol=1e-4):
-            print("Error: Weights do not sum to 1 or length mismatch")
-            print(f"Weights: {weights}, Sum: {weight_sum}, Outgoing runs: {len(self.outgoing_runs)}")
-            return None
+        # Normalize weights to sum to 1.0
+        if weight_sum > 0:
+            weights = [w / weight_sum for w in weights]
+        else:
+            # If all weights are 0, use uniform distribution
+            weights = [1.0 / len(available_runs)] * len(available_runs)
 
         # make choice
-        run_choice = np.random.choice(self.outgoing_runs, p=weights)
+        # print(f"Choosing run from available runs: {[run.name for run in available_runs]} with weights: {weights}")
+        run_choice = np.random.choice(available_runs, p=weights)
+        # print(f"Chosen run: {run_choice.name}")
         return run_choice
 
     def handle_arrival(self, current_time: float, skier: Skier, schedule: Callable[[Event], None], close_time: float = float('inf')) -> None:
@@ -89,7 +102,7 @@ class Lift:
         for skier in departing_skiers:
             skier.finish_lift(current_time)  # Track when skier finishes lift ride
             
-            run = self.choose_run()
+            run = self.choose_run(skier.get_stats()['number_of_runs'])
             if run is None:
                 print("Error: No run chosen from lift")
                 continue
