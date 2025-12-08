@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 np.random.seed(1)
 
 CLOSE_TIME = 6.5 * 60.0 # 9am to 3:30 pm = 6.5 hours = 390 minutes
-# LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
 
 def main():
   # Initialize the system
@@ -40,8 +39,7 @@ def main():
       schedule(event_queue, Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
 
       # Send to entry lift
-      # TODO we should pick this based on weights. Random for now
-      entry_lift: Lift = np.random.choice(entry_lifts)
+      entry_lift: Lift = np.random.choice(entry_lifts, p=[0.35, 0.35, 0.1, 0.2])
       entry_lift.handle_arrival(current_time, new_skier, lambda e: schedule(event_queue, e))
 
     elif ev.etype == Event.EventType.LIFT_START:
@@ -135,7 +133,7 @@ def print_stats():
   runs = [skier.get_stats()['number_of_runs'] for skier in skiers]
   
   plt.figure(figsize=(10, 6))
-  plt.hist(runs, bins=range(min(runs), max(runs) + 2), align='left', rwidth=1, edgecolor='black')
+  plt.hist(runs, bins=range(min(runs), max(runs) + 2), align='left', rwidth=0.8, edgecolor='black')
   plt.title('Distribution of Runs per Skier')
   plt.xlabel('Number of Runs')
   plt.ylabel('Number of Skiers')
