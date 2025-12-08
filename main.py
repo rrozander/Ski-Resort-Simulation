@@ -7,7 +7,7 @@ import heapq
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(3)
+np.random.seed(1)
 
 CLOSE_TIME = 6.5 * 60.0 # 9am to 3:30 pm = 6.5 hours = 390 minutes
 # LAMBDA = 1 / 0.5   # mean 0.5 min between resort arrivals
@@ -91,22 +91,22 @@ def get_nspp_rate(current_time: float) -> float:
   # Best guess at arrival rates, we can adjust as needed
 
   if current_time < 60.0:
-    return 1 / 0.2  # High arrival rate in first hour
+    return 0.1  # High arrival rate in first hour
   elif current_time < 120.0:
-    return 1 / 0.5
+    return 0.15
   elif current_time < 240.0:
-    return 1 / 1.0
+    return 0.5
   elif current_time < 300.0:
-    return 1 / 2.0
+    return 3.0
   elif current_time < CLOSE_TIME- 30.0:
-    return 1 / 5.0  # Low arrival rate before closing
+    return 8.0  # Low arrival rate before closing
   else:
     return 0.0 # No arrivals in last 30 minutes
 
 
 def print_stats():
   # Use all_skiers instead of just skiers_processed to include everyone
-  skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.get_stats()['number_of_runs'], reverse=True)
+  skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.get_stats()['total_time_at_resort'], reverse=True)
 
 
   avg_total_time = np.mean([skier.get_total_time_at_resort() for skier in skiers])
@@ -135,7 +135,7 @@ def print_stats():
   runs = [skier.get_stats()['number_of_runs'] for skier in skiers]
   
   plt.figure(figsize=(10, 6))
-  plt.hist(runs, bins=range(min(runs), max(runs) + 2), align='left', rwidth=0.8, edgecolor='black')
+  plt.hist(runs, bins=range(min(runs), max(runs) + 2), align='left', rwidth=1, edgecolor='black')
   plt.title('Distribution of Runs per Skier')
   plt.xlabel('Number of Runs')
   plt.ylabel('Number of Skiers')
@@ -146,39 +146,39 @@ def print_stats():
 
 def initialize_runs_and_lifts():
   # create all runs
-  run_E_W = Run(name="E_W", avg_time=0.5, chance_to_take=0.1)
-  run_E_H = Run(name="E_H", avg_time=3.5, chance_to_take=0.15)
+  run_E_W = Run(name="E_W", avg_time=2, chance_to_take=0.1)
+  run_E_H = Run(name="E_H", avg_time=6.5, chance_to_take=0.15)
   run_E_BB = Run(name="E_BB", avg_time=12.5, chance_to_take=0.1)
-  run_E_S = Run(name="E_S", avg_time=7.5, chance_to_take=0.2) # Updated from 15%
-  run_E_E = Run(name="E_E", avg_time=7.5, chance_to_take=0.4)
+  run_E_S = Run(name="E_S", avg_time=10.5, chance_to_take=0.2) # Updated from 15%
+  run_E_E = Run(name="E_E", avg_time=10.5, chance_to_take=0.4)
   run_E_Out = Run(name="E_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
-  run_W_E = Run(name="W_E", avg_time=0.5, chance_to_take=0.25)
-  run_W_S = Run(name="W_S", avg_time=6, chance_to_take=0.2) # Updated from 15%
-  run_W_H = Run(name="W_H", avg_time=4, chance_to_take=0.15)
-  run_W_W = Run(name="W_W", avg_time=5, chance_to_take=0.35)
+  run_W_E = Run(name="W_E", avg_time=2, chance_to_take=0.25)
+  run_W_S = Run(name="W_S", avg_time=8, chance_to_take=0.2) # Updated from 15%
+  run_W_H = Run(name="W_H", avg_time=8, chance_to_take=0.15)
+  run_W_W = Run(name="W_W", avg_time=10, chance_to_take=0.35)
   run_W_Out = Run(name="W_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
-  run_S_S = Run(name="S_S", avg_time=8, chance_to_take=0.4)
-  run_S_W = Run(name="S_W", avg_time=6, chance_to_take=0.15) # Updated from 10%
-  run_S_E = Run(name="S_E", avg_time=6.5, chance_to_take=0.25)
-  run_S_H = Run(name="S_H", avg_time=10, chance_to_take=0.15)
+  run_S_S = Run(name="S_S", avg_time=10, chance_to_take=0.4)
+  run_S_W = Run(name="S_W", avg_time=8, chance_to_take=0.15) # Updated from 10%
+  run_S_E = Run(name="S_E", avg_time=8.5, chance_to_take=0.25)
+  run_S_H = Run(name="S_H", avg_time=12, chance_to_take=0.15)
   run_S_Out = Run(name="S_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
-  run_H_H = Run(name="H_H", avg_time=7, chance_to_take=0.5)
-  run_H_E = Run(name="H_E", avg_time=5, chance_to_take=0.25) # Updated from 20%
-  run_H_W = Run(name="H_W", avg_time=5.5, chance_to_take=0.05)
-  run_H_BF = Run(name="H_BF", avg_time=2.5, chance_to_take=0.15)
+  run_H_H = Run(name="H_H", avg_time=9, chance_to_take=0.5)
+  run_H_E = Run(name="H_E", avg_time=7, chance_to_take=0.25) # Updated from 20%
+  run_H_W = Run(name="H_W", avg_time=7.5, chance_to_take=0.05)
+  run_H_BF = Run(name="H_BF", avg_time=6.5, chance_to_take=0.15)
   run_H_Out = Run(name="H_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
-  run_BF_BF = Run(name="BF_BF", avg_time=5, chance_to_take=0.1)
-  run_BF_H = Run(name="BF_H", avg_time=10, chance_to_take=0.15)
-  run_BF_BB = Run(name="BF_BB", avg_time=10, chance_to_take=0.75)
+  run_BF_BF = Run(name="BF_BF", avg_time=7, chance_to_take=0.1)
+  run_BF_H = Run(name="BF_H", avg_time=12, chance_to_take=0.15)
+  run_BF_BB = Run(name="BF_BB", avg_time=12, chance_to_take=0.75)
 
-  run_BB_BB = Run(name="BB_BB", avg_time=10, chance_to_take=0.55)
-  run_BB_BF = Run(name="BB_BF", avg_time=5, chance_to_take=0.1) 
-  run_BB_E = Run(name="BB_E", avg_time=7.5, chance_to_take=0.2)
-  run_BB_H = Run(name="BB_H", avg_time=7.5, chance_to_take=0.15)
+  run_BB_BB = Run(name="BB_BB", avg_time=12, chance_to_take=0.55)
+  run_BB_BF = Run(name="BB_BF", avg_time=7, chance_to_take=0.1) 
+  run_BB_E = Run(name="BB_E", avg_time=9.5, chance_to_take=0.2)
+  run_BB_H = Run(name="BB_H", avg_time=9.5, chance_to_take=0.15)
 
   # create all lifts
   lift_E = Lift(
@@ -258,6 +258,7 @@ def initialize_runs_and_lifts():
   # Runs that go *to* BF
   run_BF_BF.dest_lift = lift_BF   # BF → BF loop
   run_BB_BF.dest_lift = lift_BF
+  run_H_BF.dest_lift = lift_BF
 
   # Runs that go *to* BB
   run_E_BB.dest_lift  = lift_BB
