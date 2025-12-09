@@ -13,7 +13,7 @@ class Lift:
         self.name = name
         self.lift_capacity = capacity
         self.lift_speed = speed # How long it takes to ride the lift - in minutes
-        self.lift_wait_time: float = 0.5 # Wait for a lift to arrive + pick people up - in minutes <- chair every 30 sec
+        self.lift_wait_time = speed / 20.0 # Time between chairs arriving - in minutes
         self.incoming_runs: list[Run] = incoming_runs
         self.outgoing_runs: list[Run] = outgoing_runs
 

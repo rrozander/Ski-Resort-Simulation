@@ -7,7 +7,7 @@ import heapq
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(55627)
+np.random.seed(10430)
 
 CLOSE_TIME = 6.5 * 60.0 # 9am to 3:30 pm = 6.5 hours = 390 minutes
 
@@ -39,7 +39,7 @@ def main():
       schedule(event_queue, Event(current_time + inter, Event.EventType.RESORT_ARRIVAL, None, None))
 
       # Send to entry lift
-      entry_lift: Lift = np.random.choice(entry_lifts, p=[0.35, 0.35, 0.1, 0.2])
+      entry_lift: Lift = np.random.choice(entry_lifts, p=[0.5, 0.15, 0.2, 0.15])
       entry_lift.handle_arrival(current_time, new_skier, lambda e: schedule(event_queue, e))
 
     elif ev.etype == Event.EventType.LIFT_START:
@@ -50,14 +50,12 @@ def main():
     elif ev.etype == Event.EventType.LIFT_DEPART:
       # call depart method of lift
       lift: Lift = ev.obj 
-
       lift.handle_departure(current_time, lambda e: schedule(event_queue, e))
 
     elif ev.etype == Event.EventType.RUN_FINISH:
       # call depart function of run
       # print(f"Run finish at time {current_time:.2f} minutes")
       run: Run = ev.obj
-
       run.handle_run_finish(current_time, ev.skier, lambda e: schedule(event_queue, e))
     
     # Time average statistics
@@ -152,14 +150,14 @@ def print_stats(lifts: list[Lift]):
 
 def initialize_runs_and_lifts():
   # create all runs
-  run_E_W = Run(name="E_W", avg_time=2, chance_to_take=0.1)
+  run_E_W = Run(name="E_W", avg_time=1, chance_to_take=0.1)
   run_E_H = Run(name="E_H", avg_time=6.5, chance_to_take=0.15)
   run_E_BB = Run(name="E_BB", avg_time=12.5, chance_to_take=0.1)
   run_E_S = Run(name="E_S", avg_time=10.5, chance_to_take=0.2) # Updated from 15%
   run_E_E = Run(name="E_E", avg_time=10.5, chance_to_take=0.4)
   run_E_Out = Run(name="E_Out", avg_time=0, chance_to_take=0.05) # Updated from 10%
 
-  run_W_E = Run(name="W_E", avg_time=2, chance_to_take=0.25)
+  run_W_E = Run(name="W_E", avg_time=1, chance_to_take=0.25)
   run_W_S = Run(name="W_S", avg_time=8, chance_to_take=0.2) # Updated from 15%
   run_W_H = Run(name="W_H", avg_time=8, chance_to_take=0.15)
   run_W_W = Run(name="W_W", avg_time=10, chance_to_take=0.35)
