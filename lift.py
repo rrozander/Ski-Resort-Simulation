@@ -19,6 +19,7 @@ class Lift:
 
         self.queue: list[Skier] = []
         self.skiers_in_service: list[list[Skier]] = [] # Each element is a group of skiers on a chair
+        self.wait_times: list[float] = [] # Track wait times for this lift
 
     # need a function to choose next run
     def choose_run(self, number_of_runs: int) -> Run | None:
@@ -81,6 +82,12 @@ class Lift:
         skiers_loaded = []
         for _ in range(num_to_load):
             skier = self.queue.pop(0)
+            
+            # Calculate and record wait time
+            if skier.current_queue_entry_time is not None:
+                wait_time = current_time - skier.current_queue_entry_time
+                self.wait_times.append(wait_time)
+            
             skiers_loaded.append(skier)
             skier.start_lift(current_time)  # Track when skier starts lift ride
         self.skiers_in_service.append(skiers_loaded)

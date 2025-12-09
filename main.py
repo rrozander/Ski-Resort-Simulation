@@ -7,7 +7,7 @@ import heapq
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(1)
+np.random.seed(55627)
 
 CLOSE_TIME = 6.5 * 60.0 # 9am to 3:30 pm = 6.5 hours = 390 minutes
 
@@ -16,7 +16,7 @@ def main():
   event_queue: list[Event] = []
   sim_time = 0.0
 
-  entry_lifts: list[Lift] = initialize_runs_and_lifts()
+  entry_lifts, all_lifts = initialize_runs_and_lifts()
 
   # Initialize with first resort arrival
   arrival_dt = Event.generateInterArrival(get_nspp_rate(sim_time))
@@ -70,7 +70,7 @@ def main():
     if skier.departure_time is None:
       skier.leave_resort(final_time)
   
-  print_stats()
+  print_stats(all_lifts)
 
   print("Simulation complete")
 
@@ -102,7 +102,7 @@ def get_nspp_rate(current_time: float) -> float:
     return 0.0 # No arrivals in last 30 minutes
 
 
-def print_stats():
+def print_stats(lifts: list[Lift]):
   # Use all_skiers instead of just skiers_processed to include everyone
   skiers: list[Skier] = sorted(Skier.all_skiers, key=lambda skier: skier.get_stats()['total_time_at_resort'], reverse=True)
 
@@ -128,6 +128,14 @@ def print_stats():
   print(f"Average time on lifts: {avg_lift_time:.2f} minutes")
   print(f"Average time skiing: {avg_ski_time:.2f} minutes")
   print(f"Average number of runs completed: {avg_runs:.2f}")
+
+  print("\nAverage Wait Time per Lift:")
+  for lift in lifts:
+      if lift.wait_times:
+          avg_wait = np.mean(lift.wait_times)
+          print(f"  {lift.name}: {avg_wait:.2f} minutes")
+      else:
+          print(f"  {lift.name}: 0.00 minutes (No skiers served)")
 
   # Create histogram of runs per skier
   runs = [skier.get_stats()['number_of_runs'] for skier in skiers]
@@ -264,7 +272,7 @@ def initialize_runs_and_lifts():
   run_BB_BB.dest_lift = lift_BB   # BB → BB loop
 
 
-  return [lift_H, lift_E, lift_W, lift_S]  # entry lifts
+  return [lift_H, lift_E, lift_W, lift_S], [lift_E, lift_W, lift_S, lift_H, lift_BF, lift_BB]  # entry lifts, all lifts
 
 
 if __name__ == "__main__":
