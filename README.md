@@ -3,7 +3,8 @@ Ski lift simulation project for UVic CSC 446 (Simulations in Operations Research
 
 The casy study for this particular simulation will be Mount Washington Ski Resort located on Vancouver Island.
 
-https://docs.google.com/document/d/1bMfGU1V7F6jM_GblCSP-SJLqKK_qaCT2g83biJwS7cA/edit?usp=sharing
+The associated report can be downloaded and viewed here: [CSC 446 Project Report.pdf](https://github.com/user-attachments/files/24093221/CSC.446.Project.Report.pdf)
+
 ## Purpose
 - Design and implement a discrete-event simulation of the resort lift and runs.
 - Evaluate key metrics that include the average wait time, lift utilization, and total skier throughput.
@@ -22,5 +23,9 @@ Here is the run and lift network for Mount Washington Ski Resort that is used as
 
 
 The resulting queueing network with the assumed probabilities for moving through the resort is shown below.
-<img width="1667" height="2356" alt="CSC446QueueNetwork-1" src="https://github.com/user-attachments/assets/2001a864-b9e2-43b0-b6c9-891b5301b553" />
+<img width="700" height="1000" alt="LiftNetwork" src="https://github.com/user-attachments/assets/25efd234-6d43-4a2b-9b87-678b89d8f67d" />
 
+## Results 
+A summary of the results can be viewed in the graph below.
+
+<img width="1200" height="600" alt="results_graph" src="https://github.com/user-attachments/assets/8b0988a8-554a-40bf-9361-4bc273416bcb" />
